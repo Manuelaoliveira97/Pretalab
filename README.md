@@ -1,101 +1,68 @@
+# 📊 Análise da Violência Contra Pessoas LGBTQIA+ no Brasil
 
-# 📸 Classificação e Detecção de Objetos em Imagens com Transformers
+**Repositório oficial do projeto final do curso de Inteligencia Artificial organizado por PertaLabs**  
+Grupo: Análise da violência contra a população LGBTQIA+ utilizando dados do Grupo Gay da Bahia (GGB)
 
-Este projeto demonstra como utilizar **modelos pré-treinados da Hugging Face** para realizar **classificação de imagens** e **detecção de objetos**, aplicando técnicas modernas de Visão Computacional com o poder do `transformers`.
-
----
-
-## 🚀 Tecnologias Utilizadas
-
-- [Transformers](https://huggingface.co/transformers/) - Biblioteca da Hugging Face
-- `pipeline` para classificação de imagem e detecção de objetos
-- Modelos:
-  - `google/vit-base-patch32-384` (ViT - Vision Transformer)
-  - `facebook/detr-resnet-50` (DEtection TRansformer)
-  - `google/vit-base-patch16-224`
-- Python
-- [Pillow (PIL)](https://pillow.readthedocs.io/en/stable/) para manipulação de imagens
+🔗 Repositório no GitHub: [GriseldaJusto/Analise---violencia-contra-lgbtqia](https://github.com/GriseldaJusto/Analise---violencia-contra-lgbtqia)  
+📄 Fonte dos dados: [Base dos Dados - Relatório de Violência LGBTQIA+ (GGB)](https://basedosdados.org/dataset/f83a600b-4aa5-4386-bc21-f5f6859e9605?table=b246fc07-f9a2-451b-a02c-8f0301682e99)
 
 ---
 
-## 📂 Estrutura do Projeto
+## 🏳️‍🌈 Contexto
 
-- **Download da imagem** de demonstração
-- **Classificação geral da imagem** usando Vision Transformer (ViT)
-- **Detecção de objetos e pessoas** usando o modelo DETR (Facebook)
-- **Classificação da pessoa detectada** na imagem
+O Brasil lidera rankings mundiais de violência contra pessoas LGBTQIA+. A análise utiliza dados anuais do **Grupo Gay da Bahia**, uma das instituições mais antigas de defesa dos direitos LGBTQIA+ no país. O objetivo é compreender padrões territoriais e demográficos nos registros de assassinatos dessa população.
 
 ---
 
-## 📥 Requisitos
+## ❓ Perguntas Orientadoras
 
-- Python 3.8+
-- `transformers`
-- `torch`
-- `Pillow`
-
-Instale os pacotes necessários com:
-
-```bash
-pip install transformers torch pillow
-```
+1. **Quais estados têm as maiores taxas de violência contra a população LGBTQIA+?**
+2. **Há padrões sazonais ou demográficos (idade, raça ou identidade de gênero) nos crimes?**
 
 ---
 
-## 📷 Exemplo de Execução
+## ⚙️ Metodologia
 
-### 1. Baixar a imagem:
-
-```python
-!wget https://img.freepik.com/fotos-premium/mulher-negra-de-cuidados-com-a-pele-e-creme-para-rosto-detox-organico-facial-e-em-fundo-de-estudio-marrom-garota-afro-americana-e-locao-para-bem-estar-pele-suave-e-clara-para-beleza-e-cosmeticos_590464-122679.jpg
-```
-
-### 2. Classificação da Imagem
-
-```python
-from transformers import pipeline
-from PIL import Image
-
-pipe = pipeline("image-classification", model="google/vit-base-patch32-384", device=0)
-imagem = Image.open("mulher-negra-...jpg")
-res = pipe(imagem)
-```
-
-### 3. Detecção de Objetos e Classificação Focada
-
-```python
-detector = pipeline("object-detection", model="facebook/detr-resnet-50")
-classifier = pipeline("image-classification", model="google/vit-base-patch16-224")
-
-detections = detector(imagem)
-person_bbox = [d for d in detections if d['label'] == 'person'][0]
-
-result = classifier(imagem)
-```
-
-### 4. Exibição dos Resultados
-
-```python
-for item in result:
-    print(f"🏷️ {item['label'].upper():<30} | 📊 {item['score']*100:.2f}%")
-```
+- Para a análise, os arquivos CSV foram previamente baixados da plataforma e carregados localmente no ambiente de desenvolvimento (Google Colab).
+- Foi realizado o tratamento dos dados com `pandas`, incluindo remoção de nulos e padronização de colunas.
+- Foram geradas visualizações com `seaborn` e `matplotlib` para responder às perguntas orientadoras.
+- Utilizamos gráficos de barras para destacar:
+  - Estados com mais homicídios
+  - Raça/cor das vítimas
+  - Identidade de gênero
 
 ---
 
-## 🎯 Resultado Esperado
+## Análise com Machine Learning: Previsão de Risco
 
-O código deve retornar as **principais categorias associadas à imagem** com **probabilidades**, além de detectar objetos/pessoas na foto e aplicar a classificação especificamente à pessoa.
+Neste projeto, foi explorada uma aplicação inicial de Machine Learning para prever o número de homicídios com base em atributos demográficos, utilizando o dataset por raça/cor (`df_raca`).
+
+### Metodologia
+
+- O conjunto de dados foi preparado transformando a variável categórica `raca_cor` em variáveis dummy (one-hot encoding).
+- A variável alvo (`y`) foi o número de homicídios, e as variáveis explicativas (`X`) foram as colunas resultantes da codificação das raças.
+- O modelo escolhido foi o **Random Forest Regressor**, um algoritmo robusto para regressão baseado em múltiplas árvores de decisão.
+- O conjunto de dados foi dividido em treino e teste (`random_state=42` para reprodutibilidade).
+- O modelo foi treinado no conjunto de treino e avaliado no conjunto de teste.
+
+### Resultados
+
+- O desempenho do modelo foi medido pelo **Erro Médio Absoluto (MAE)**, que indica a média do desvio absoluto entre os valores previstos e reais.
+- Um gráfico de densidade (KDE plot) foi gerado para comparar visualmente a distribuição dos valores reais e previstos, utilizando uma paleta de cores suaves e estilo clean para facilitar a interpretação.
 
 ---
 
-## 📌 Observações
+## 👥 Integrantes do Grupo
 
-- O uso da GPU (`device=0`) melhora significativamente a performance. Certifique-se de que o ambiente (como Google Colab) tenha CUDA disponível.
-- Os modelos utilizados são pré-treinados e funcionam bem para tarefas genéricas, mas podem ser substituídos por modelos customizados para domínios específicos.
+|        Nome         |                            GitHub                          |
+|---------------------|------------------------------------------------------------|
+| Griselda Justo      | [@GriseldaJusto](https://github.com/GriseldaJusto)         |
+| Camille Nogueira    | [@camizsn](https://github.com/camizsn)                     |
+| Priscila Estevao    | [@priscilaestevao](https://github.com/priscilaestevao)     |
+| Amanda Amani        | [@AmandaAmani](https://github.com/AmandaAmani)             |
+| Manuela Oliveira    | [@Manuelaoliveira97](https://github.com/Manuelaoliveira97) |
+| Raysa Leide         | [@raysaleide](https://github.com/raysaleide)               |
 
----
 
-## 🧠 Créditos
 
-- [Hugging Face Models](https://huggingface.co/models)
-- [Freepik](https://www.freepik.com) pela imagem de exemplo
+
